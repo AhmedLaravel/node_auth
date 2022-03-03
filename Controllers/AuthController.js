@@ -38,6 +38,7 @@ module.exports.register = async (req, res, next) => {
       status: true,
       message: "Please check your email to verify your password",
       data: {
+        id: user.id,
         userName: user.name,
         userEmail: user.email,
       },
@@ -68,6 +69,8 @@ module.exports.verifyUser = async (req, res, next) => {
     status: true,
     message: "user has been verified successfully",
     data: {
+      id:verifiedUser.id,
+      isVerified: verifiedUser.isVerified,
       userName: verifiedUser.name,
       userEmail: verifiedUser.email,
     },

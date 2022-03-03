@@ -1,100 +1,83 @@
 const { connect } = require("../database/connection");
 const bcrypt = require("bcrypt");
 
+const { PrismaClient } = require("@prisma/client");
+
+const prisma = new PrismaClient();
+
 // ----------------------------Check if user exists in our database--------------
-module.exports.isUser = async (email) =>
-  new Promise((resolve, reject) => {
-    connect.query(
-      `SELECT * FROM users WHERE email="${email}"`,
-      (err, result, fields) => {
-        if (err) return reject(false);
-
-        if (result.length) return resolve(true);
-
-        return resolve(false);
-      }
-    );
+module.exports.isUser = async (email) => {
+  const user = await prisma.user.findFirst({
+    where: { email: email },
   });
+  if (!user) return false;
+  return true;
+};
 
 // ----------------------------Check if add user to  database database-------------
-module.exports.addUser = async (data) =>
-  new Promise(async (resolve, reject) => {
-    const code = Math.floor(1000 + Math.random() * 9000);
-    const salt = await bcrypt.genSalt(10);
-    const password = await bcrypt.hash(data.password, salt);
-    var sql = `INSERT INTO users (name, email, password, verification_code) values ("${data.name}","${data.email}", "${password}","${code}")`;
-    connect.query(sql, (err, result, fields) => {
-      if (err) return reject(null);
-      return resolve(this.getUserById(result.insertId));
-    });
+module.exports.addUser = async (data) => {
+  const code = Math.floor(1000 + Math.random() * 9000);
+  const salt = await bcrypt.genSalt(10);
+  const password = await bcrypt.hash(data.password, salt);
+  const user = await prisma.user.create({
+    data: {
+      name: data.name,
+      email: data.email,
+      verificationCode: String(code),
+      password: password,
+    },
   });
 
-//-----------------------------------Get a user by his ID----------------------------
-module.exports.getUserById = async (id) =>
-  new Promise((resolve, reject) =>
-    connect.query(
-      `SELECT * FROM users WHERE id="${id}" LIMIT 1`,
-      (err, result, fields) => {
-        if (err) return reject(null);
-
-        if (result.length) return resolve(result[0]);
-
-        return resolve(null);
-      }
-    )
-  );
+  return user;
+};
 
 //-----------------------------------Get a user by his ID----------------------------
-module.exports.getUserByEmail = async (email) =>
-  new Promise((resolve, reject) =>
-    connect.query(
-      `SELECT * FROM users WHERE email="${email}" LIMIT 1`,
-      (err, result, fields) => {
-        if (err) return reject(null);
+module.exports.getUserById = async (id) => {
+  const user = await prisma.user.findFirst({
+    where: { id: id },
+  });
+  return user;
+};
 
-        if (result.length) return resolve(result[0]);
-
-        return resolve(null);
-      }
-    )
-  );
+//-----------------------------------Get a user by his ID----------------------------
+module.exports.getUserByEmail = async (email) => {
+  const user = await prisma.user.findFirst({
+    where: { email: email },
+  });
+  return user;
+};
 
 // ---------------------------- check if the code is valid----------------------------
-module.exports.isCodeValid = async (data) =>
-  new Promise((resolve, reject) =>
-    connect.query(
-      `SELECT * FROM users WHERE verification_code="${data.verification_code}" AND id="${data.id}"`,
-      (err, result, fields) => {
-        if (err) return reject(false);
-
-        if (result.length) return resolve(true);
-
-        return resolve(false);
-      }
-    )
-  );
+module.exports.isCodeValid = async (data) => {
+  const user = await prisma.user.findFirst({
+    where: {
+      id: Number(data.id),
+      verificationCode: data.verificationCode,
+    },
+  });
+  if (!user) return false;
+  return true;
+};
 
 //-----------------------Verify user ---------------------------------------------------
-module.exports.verifyUser = async (data) =>
-  new Promise(async (resolve, reject) => {
-    var sql = `UPDATE users set verification_code=null, is_verified="1"`;
-    connect.query(sql, (err, result, fields) => {
-      if (err) return reject(err);
-      return resolve(this.getUserById(data.id));
-    });
+module.exports.verifyUser = async (data) => {
+  const user = await prisma.user.update({
+    where: {
+      id: Number(data.id),
+    },
+    data: {
+      isVerified: true,
+      verificationCode: null,
+    },
   });
+  return user;
+};
 
 //------------------------ Check if user is verified ------------------------------------
-module.exports.isVerified = async (id) =>
-  new Promise((resolve, reject) =>
-    connect.query(
-      `SELECT * FROM users WHERE id="${id}" AND is_verified="1"`,
-      (err, result, fields) => {
-        if (err) return reject(false);
-
-        if (result.length) return resolve(true);
-
-        return resolve(false);
-      }
-    )
-  );
+module.exports.isVerified = async (id) =>{
+  const user = await prisma.user.findFirst({
+    where: { id: id, isVerified:true},
+  });
+  if(!user) return false;
+  return true;
+}

@@ -12,7 +12,7 @@ module.exports.generateAccessToken = (userId)=>{
 
         const options = {
             expiresIn: "1h",
-            issuer: "zzabbat.com",
+            issuer: `${process.env.WEB_URL}`,
             audience: `${userId}`
         }
         JWT.sign(payload,secret,options,(err, token)=>{

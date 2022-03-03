@@ -44,7 +44,7 @@ module.exports.verificationValidation =  (data) => {
   }
 
   //verification code  check validation
-  if (!data.verification_code || validator.isEmpty(data.verification_code) ) {
+  if (!data.verificationCode || validator.isEmpty(data.verificationCode) ) {
     return{
       status: false,
       message: "Verification code is required",
