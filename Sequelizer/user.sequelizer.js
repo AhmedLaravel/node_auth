@@ -1,4 +1,3 @@
-const { connect } = require("../database/connection");
 const bcrypt = require("bcrypt");
 
 const { PrismaClient } = require("@prisma/client");

@@ -1,7 +1,7 @@
 const httpErrors = require("http-errors");
 const bcrypt = require("bcrypt");
 const userRequest = require("../Request/Authentication/user.request");
-const userSequlizer = require("../Sequelizer/user.squelizer");
+const userSequlizer = require("../Sequelizer/user.sequelizer");
 const verificationEmail = require("../Mailer/verification_email");
 const {
   generateAccessToken,
@@ -24,7 +24,6 @@ module.exports.register = async (req, res, next) => {
       return res.json(validationErrors);
     }
     var exists = await userSequlizer.isUser(req.body.email);
-    console.log;
     if (exists) {
       return res.json({
         status: false,
@@ -99,6 +98,7 @@ module.exports.login = async (req, res, next) => {
         accessToken: accessToken,
         refreshToken: refreshToken,
         user: {
+          id: user.id,
           userName: user.name,
           userEmail: user.email,
         },

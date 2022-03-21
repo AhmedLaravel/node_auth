@@ -8,12 +8,63 @@ generator client {
 }
 
 model User {
-  id               Int      @id @default(autoincrement())
-  email            String   @unique
+  id               Int                  @id @default(autoincrement())
+  email            String               @unique
   name             String
   password         String
   verificationCode String?
-  isVerified       Boolean  @default(false)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @default(now())
+  isVerified       Boolean              @default(false)
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @default(now())
+  permissions      UsersOnPermissions[]
+  roles            UsersOnRoles[]
+}
+
+model Permission {
+  id        Int                  @id @default(autoincrement())
+  name      String               
+  slug      String               @unique
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @default(now())
+  users     UsersOnPermissions[]
+  roles     RolesOnPermissions[]
+}
+
+model Role {
+  id          Int                  @id @default(autoincrement())
+  name        String               
+  slug        String               @unique
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @default(now())
+  users       UsersOnRoles[]
+  permissions RolesOnPermissions[]
+}
+
+model UsersOnPermissions {
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       Int
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  permissionId Int
+  assignedAt   DateTime   @default(now())
+
+  @@id([userId, permissionId])
+}
+
+model UsersOnRoles {
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     Int
+  role       Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  roleId     Int
+  assignedAt DateTime @default(now())
+
+  @@id([userId, roleId])
+}
+
+model RolesOnPermissions {
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  permissionId Int
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  roleId       Int
+
+  @@id([permissionId, roleId])
 }
