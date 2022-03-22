@@ -1,4 +1,5 @@
 const express = require("express");
+const { route } = require("express/lib/router");
 const router = express.Router();
 const AuthController = require("../Controllers/authentication.controller");
 const PermissionsController = require("../Controllers/permissions.controller");
@@ -16,19 +17,19 @@ router.post("/token/refresh", AuthController.refresh);
 router.delete("/logout", AuthController.logout);
 
 //------------------------Roles and Permissions ---------------
-
+router.use(verifyToken);
 //Permissions
-router.get("/permissions", verifyToken, PermissionsController.all);
-router.post("/permissions/create", verifyToken, PermissionsController.create);
-router.delete("/permissions/delete", verifyToken, PermissionsController.delete);
-router.post("/permissions/assignToUser", verifyToken, PermissionsController.assignToUser);
+router.get("/permissions", PermissionsController.all);
+router.post("/permissions/create", PermissionsController.create);
+router.delete("/permissions/delete", PermissionsController.delete);
+router.post("/permissions/assignToUser", PermissionsController.assignToUser);
 
 //Roles
-router.get("/roles", verifyToken, RolesController.all);
-router.post("/roles/create", verifyToken, RolesController.create);
-router.delete("/roles/delete", verifyToken, RolesController.delete);
-router.post("/roles/assignToUser", verifyToken, RolesController.assignToUser)
-router.post("/roles/assignPermission", verifyToken, RolesController.assignPermission)
+router.get("/roles", RolesController.all);
+router.post("/roles/create", RolesController.create);
+router.delete("/roles/delete", RolesController.delete);
+router.post("/roles/assignToUser", RolesController.assignToUser)
+router.post("/roles/assignPermission", RolesController.assignPermission)
 
 
 

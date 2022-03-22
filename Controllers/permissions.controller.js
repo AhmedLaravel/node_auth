@@ -1,9 +1,18 @@
 const httpErrors = require("http-errors");
 const permissionsSequlizer = require("../Sequelizer/permissions.sequelizer");
 const validation = require("../Request/permission.request");
+const helpers = require("../Helpers/permissions_roles.helper");
 
 //--------------------------get all permissions-------------------
 module.exports.all = async (req, res, next) => {
+  const hasRole = await helpers.hasRole(Number(req.user.id), "admin");
+  if (!hasRole) {
+    return res.send({
+      status: 401,
+      message: "oops!! You are not authorized or do not have the permission",
+      data: null,
+    });
+  }
   try {
     const permissions = await permissionsSequlizer.all();
     return res.json({
@@ -18,6 +27,14 @@ module.exports.all = async (req, res, next) => {
 
 //--------------------------Create permissions-------------------
 module.exports.create = async (req, res, next) => {
+  const hasRole = await helpers.hasRole(Number(req.user.id), "admin");
+  if (!hasRole) {
+    return res.send({
+      status: 401,
+      message: "oops!! You are not authorized or do not have the permission",
+      data: null,
+    });
+  }
   try {
     // Request Validation
     await validation.create.validateAsync(req.body);
@@ -42,6 +59,14 @@ module.exports.create = async (req, res, next) => {
 
 //--------------------------Delete permissions-------------------
 module.exports.delete = async (req, res, next) => {
+  const hasRole = await helpers.hasRole(Number(req.user.id), "admin");
+  if (!hasRole) {
+    return res.send({
+      status: 401,
+      message: "oops!! You are not authorized or do not have the permission",
+      data: null,
+    });
+  }
   try {
     // Request Validation
     const validationData = await validation.delete.validateAsync(req.body);
@@ -66,6 +91,14 @@ module.exports.delete = async (req, res, next) => {
 
 //--------------------------Assign permission to User-------------------
 module.exports.assignToUser = async (req, res, next) => {
+  const hasRole = await helpers.hasRole(Number(req.user.id), "admin");
+  if (!hasRole) {
+    return res.send({
+      status: 401,
+      message: "oops!! You are not authorized or do not have the permission",
+      data: null,
+    });
+  }
   try {
     // Request Validation
     await validation.assignToUser.validateAsync(req.body);
@@ -80,11 +113,10 @@ module.exports.assignToUser = async (req, res, next) => {
     return res.json({
       status: true,
       message: "Permissions has been assigned successfully",
-      data:null
+      data: null,
     });
   } catch (error) {
     if (error.isJoi === true) error.status = 400;
     next(error);
   }
 };
-
