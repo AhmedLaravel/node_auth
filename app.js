@@ -5,9 +5,13 @@ const httpErrors = require("http-errors"); // To create out own http error objec
 const AuthRoutes = require("./Routes/api");
 const { verifyToken } = require("./Middlewares/auh.middleware");
 const helpers = require("./Helpers/permissions_roles.helper");
+const { initPassport } = require("./Helpers/passport_init.helpers");
 
 //Intializing out authentication app
 const app = express();
+
+// Intializing Passport
+initPassport(app);
 
 app.get('/', verifyToken, async(req, res, next) =>{
     const hasPermission = await helpers.hasPermissionTo(Number(req.user.id), "view");

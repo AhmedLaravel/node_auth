@@ -18,11 +18,15 @@ model User {
   updatedAt        DateTime             @default(now())
   permissions      UsersOnPermissions[]
   roles            UsersOnRoles[]
+  socials          UserOnSocial[]
+  passwordResets   PasswordReset[]
+
+
 }
 
 model Permission {
   id        Int                  @id @default(autoincrement())
-  name      String               
+  name      String
   slug      String               @unique
   createdAt DateTime             @default(now())
   updatedAt DateTime             @default(now())
@@ -32,7 +36,7 @@ model Permission {
 
 model Role {
   id          Int                  @id @default(autoincrement())
-  name        String               
+  name        String
   slug        String               @unique
   createdAt   DateTime             @default(now())
   updatedAt   DateTime             @default(now())
@@ -67,4 +71,20 @@ model RolesOnPermissions {
   roleId       Int
 
   @@id([permissionId, roleId])
+}
+
+model UserOnSocial {
+  id     Int    @id @default(autoincrement())
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+  name   String
+}
+
+model PasswordReset {
+  id     Int  @id @default(autoincrement())
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+  code   String
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @default(now())
 }

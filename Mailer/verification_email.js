@@ -5,7 +5,7 @@ module.exports.verificationEmail = async (user) => {
   mail.message.subject = "User verification";
   mail.message.html = `
   <center>
-  <h1>hello ${user.name}</h1>
+  <h1>Hello ${user.name}</h1>
   <br>
   <h3>Welcome to ${process.env.APP_NAME}, please copy the code: ${user.verificationCode} to confirm your verification</h3>
   </center>
